@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+.dark body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+/* Subtle grid background used in the hero */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.dark .bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+}
+
+/* Reusable section container */
+.section {
+  @apply mx-auto max-w-6xl px-6 py-24 sm:py-28;
+}
+
+.section-title {
+  @apply text-3xl sm:text-4xl font-bold tracking-tight;
+}
+
+.eyebrow {
+  @apply inline-block text-xs font-semibold tracking-widest uppercase text-brand-600 dark:text-brand-400;
+}
+
+/* Card */
+.card {
+  @apply rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60
+         backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow;
+}
+
+/* Button */
+.btn {
+  @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700;
+}
+
+.btn-ghost {
+  @apply btn border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200
+         hover:bg-slate-100 dark:hover:bg-slate-800;
+}
