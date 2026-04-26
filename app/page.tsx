@@ -1,25 +1,27 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import About from "@/components/About";
-import Skills from "@/components/Skills";
-import Projects from "@/components/Projects";
-import Experience from "@/components/Experience";
-import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+'use client'
+import dynamic from 'next/dynamic'
+import StartScreen from '@/components/game/StartScreen'
+import MilestoneCard from '@/components/game/MilestoneCard'
+import HUD from '@/components/game/HUD'
+
+const GameCanvas = dynamic(() => import('@/components/game/GameCanvas'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-[#050714]">
+      <p className="text-cyan-400 font-mono text-sm animate-pulse tracking-widest">
+        LOADING WORLD...
+      </p>
+    </div>
+  ),
+})
 
 export default function Home() {
   return (
-    <>
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Experience />
-        <Contact />
-      </main>
-      <Footer />
-    </>
-  );
+    <div className="relative w-screen h-screen overflow-hidden bg-[#050714]">
+      <GameCanvas />
+      <StartScreen />
+      <MilestoneCard />
+      <HUD />
+    </div>
+  )
 }

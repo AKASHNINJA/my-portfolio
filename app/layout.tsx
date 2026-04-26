@@ -24,24 +24,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Avoid theme-flash: read preference before hydration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var t = localStorage.getItem('theme');
-                  if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `
-          }}
-        />
-      </head>
-      <body>{children}</body>
+      <head />
+      <body style={{ margin: 0, padding: 0, background: '#050714' }}>{children}</body>
     </html>
   );
 }

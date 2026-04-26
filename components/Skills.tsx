@@ -3,7 +3,12 @@
 import { motion } from "framer-motion";
 import { skills, type Skill } from "@/lib/data";
 
-const categories: Skill["category"][] = ["Frontend", "Backend", "AI/ML", "Tools"];
+const categories: Skill["category"][] = [
+  "Product & Implementation",
+  "Tools & Platforms",
+  "Domain",
+  "AI & Automation"
+];
 
 export default function Skills() {
   return (

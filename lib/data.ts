@@ -4,50 +4,62 @@
  */
 
 export const profile = {
-  name: "Akash",
-  title: "Full-Stack Developer & Builder",
+  name: "Akash Premkumar",
+  title: "Implementation Consultant & Product-minded Builder",
   tagline:
-    "I design and ship delightful products at the intersection of AI, web, and great UX.",
-  location: "India",
-  email: "hello@example.com",
+    "I turn customer pain points into shipped product outcomes — bridging implementation, AI tooling, and product strategy in SaaS and fintech.",
+  location: "Chennai, India",
+  email: "akashninja1123@gmail.com",
+  phone: "+91 7358 200 179",
   resumeUrl: "/resume.pdf",
   socials: {
-    github: "https://github.com/your-handle",
-    linkedin: "https://linkedin.com/in/your-handle",
-    twitter: "https://x.com/your-handle"
+    github: "https://github.com/AKASHNINJA",
+    linkedin: "https://www.linkedin.com/in/akash-premkumar-a95a42161/"
   }
 };
 
 export const about = {
   paragraphs: [
-    "I'm a developer who loves turning fuzzy ideas into shipping software. Over the last few years I've built web apps, AI-powered tools, and developer experiences that people actually use.",
-    "I care a lot about craft — performant code, clean interfaces, and thoughtful product decisions. When I'm not coding, you'll find me exploring new tech, reading, or building side projects."
+    "I'm an Implementation Consultant at Chargebee with 3 years of experience helping SaaS and fintech companies go live successfully. I've delivered 50+ customer projects end-to-end — owning configurations, integrations, and data migrations — and I love sitting at the seam between customers, product, and engineering.",
+    "I care about turning fuzzy customer pain into crisp product outcomes. That's led me to build internal AI tools like a Revenue Recognition Simulator and a Language Pack Translator, and to push 15+ customer-driven insights into the product roadmap. Outside delivery, I document, train, and lift the team's bar."
   ],
   highlights: [
-    "5+ years building production web applications",
-    "Comfortable across the stack: Next.js, Node, Python, Postgres",
-    "Shipped AI-driven features used by thousands of users",
-    "Open-source contributor"
+    "3 years in product implementation across SaaS & fintech",
+    "Delivered 50+ customer projects with 100% successful go-lives",
+    "Built AI tools that cut onboarding setup time by 40%",
+    "Translated 15+ customer pain points into roadmap items",
+    "Department Gold Medalist, B.E. EEE, SSN College of Engineering (CGPA 9.6)"
   ]
 };
 
-export type Skill = { name: string; category: "Frontend" | "Backend" | "AI/ML" | "Tools" };
+export type Skill = {
+  name: string;
+  category: "Product & Implementation" | "Tools & Platforms" | "Domain" | "AI & Automation";
+};
 
 export const skills: Skill[] = [
-  { name: "TypeScript", category: "Frontend" },
-  { name: "React", category: "Frontend" },
-  { name: "Next.js", category: "Frontend" },
-  { name: "Tailwind CSS", category: "Frontend" },
-  { name: "Node.js", category: "Backend" },
-  { name: "Python", category: "Backend" },
-  { name: "PostgreSQL", category: "Backend" },
-  { name: "REST & GraphQL", category: "Backend" },
-  { name: "OpenAI / LLMs", category: "AI/ML" },
-  { name: "LangChain", category: "AI/ML" },
-  { name: "Vector DBs", category: "AI/ML" },
-  { name: "Git / GitHub", category: "Tools" },
-  { name: "Docker", category: "Tools" },
-  { name: "Vercel / AWS", category: "Tools" }
+  { name: "Customer Onboarding", category: "Product & Implementation" },
+  { name: "Requirements Gathering", category: "Product & Implementation" },
+  { name: "Solution Design", category: "Product & Implementation" },
+  { name: "Integrations", category: "Product & Implementation" },
+  { name: "Data Migration", category: "Product & Implementation" },
+  { name: "Stakeholder Management", category: "Product & Implementation" },
+
+  { name: "Chargebee", category: "Tools & Platforms" },
+  { name: "Everstage", category: "Tools & Platforms" },
+  { name: "SQL", category: "Tools & Platforms" },
+  { name: "Postman / REST APIs", category: "Tools & Platforms" },
+  { name: "Jira / Notion", category: "Tools & Platforms" },
+
+  { name: "SaaS", category: "Domain" },
+  { name: "Fintech", category: "Domain" },
+  { name: "Subscription Billing", category: "Domain" },
+  { name: "Revenue Recognition", category: "Domain" },
+  { name: "Sales Compensation", category: "Domain" },
+
+  { name: "AI Tooling", category: "AI & Automation" },
+  { name: "Prompt Engineering", category: "AI & Automation" },
+  { name: "Workflow Automation", category: "AI & Automation" }
 ];
 
 export type Project = {
@@ -61,28 +73,26 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    title: "Agentic To-Do",
+    title: "Revenue Recognition Simulator",
     description:
-      "An AI-native task manager where an agent breaks down goals, schedules them, and follows up automatically.",
-    tags: ["Next.js", "OpenAI", "Postgres"],
-    repoUrl: "https://github.com/your-handle/agentic-to-do-app",
+      "Internal AI tool that automates revenue recognition scenario testing for global merchants, reducing manual setup time by 40% during onboarding.",
+    tags: ["AI", "Revenue Recognition", "SaaS Onboarding"],
     featured: true
   },
   {
-    title: "Tracker Agents",
+    title: "Language Pack Translator",
     description:
-      "A multi-agent system that monitors workflows, surfaces blockers, and writes daily standup summaries.",
-    tags: ["TypeScript", "LangChain", "Slack API"],
-    repoUrl: "https://github.com/your-handle/tracker-agents",
+      "AI-powered translation tool that streamlines multilingual onboarding for global merchants, accelerating localization and time-to-go-live.",
+    tags: ["AI", "Localization", "Onboarding"],
     featured: true
   },
   {
-    title: "Portfolio v2",
+    title: "Implementation Playbooks",
     description:
-      "This very site — built with Next.js 14 App Router, Tailwind, and Framer Motion.",
-    tags: ["Next.js", "Tailwind", "Framer Motion"],
-    repoUrl: "https://github.com/your-handle/my-portfolio"
+      "Documented best practices and reusable playbooks across SaaS and fintech implementations, training cross-functional teams and lifting team productivity by 30%.",
+    tags: ["Documentation", "Enablement", "Process"]
   }
+  // TODO: add personal/side projects (e.g. Agentic To-Do, Tracker Agents) with real repo URLs.
 ];
 
 export type Experience = {
@@ -94,22 +104,70 @@ export type Experience = {
 
 export const experience: Experience[] = [
   {
-    role: "Senior Software Engineer",
-    company: "Your Company",
-    period: "2023 — Present",
+    role: "Implementation Consultant",
+    company: "Chargebee",
+    period: "Sep 2024 — Present",
     bullets: [
-      "Led a team of 4 to ship the v2 platform, growing weekly active users 3x.",
-      "Designed and built an LLM-powered assistant adopted by 60% of customers.",
-      "Mentored juniors, established code review and testing standards."
+      "Implemented SMB and Enterprise customer projects across SaaS, e-commerce, and fintech domains by managing configurations, integrations, and data migrations end-to-end — resulting in successful go-lives and accelerating customers' revenue realization.",
+      "Developed internal enablement tools including the RevRec Simulator (automating revenue recognition scenarios) and Language Pack Translator (streamlining multilingual onboarding), reducing setup time by 35% and improving onboarding efficiency.",
+      "Partnered with Product and Engineering teams to introduce AI-driven automation and product enhancements, eliminating 40% of manual configuration effort and improving implementation turnaround time from weeks to days.",
+      "Advocated customer needs during onboarding, translating pain points into actionable product insights adopted into the roadmap — enhancing product usability and increasing customer satisfaction scores."
     ]
   },
   {
-    role: "Software Engineer",
-    company: "Previous Co.",
-    period: "2021 — 2023",
+    role: "Solution Specialist",
+    company: "Everstage",
+    period: "Jan 2023 — Sep 2024",
     bullets: [
-      "Owned end-to-end delivery of the analytics dashboard used by 10k+ users.",
-      "Cut p95 API latency by 65% through query and caching improvements."
+      "Successfully onboarded multiple SMB and Enterprise customers, facilitating seamless transitions and fostering strong client relationships.",
+      "Served as the primary point of contact for clients throughout the engagement process, addressing concerns, providing updates, and ensuring client satisfaction.",
+      "Collaborated closely with Technical teams to understand client requirements and support the sales process.",
+      "Worked on CRMs including Salesforce (SFDC), NetSuite, and HubSpot to configure and tailor implementations to each client's business workflows."
     ]
+  }
+];
+
+export type EducationEntry = {
+  school: string;
+  qualification: string;
+  period: string;
+  details: string[];
+};
+
+export const education: EducationEntry[] = [
+  {
+    school: "SSN College of Engineering, Chennai",
+    qualification: "B.E. — Electrical and Electronics Engineering",
+    period: "2019 — 2023",
+    details: ["CGPA: 9.6 / 10", "Department Gold Medalist"]
+  },
+  {
+    school: "The Hindu Colony Chellammal Vidyalaya Sr. Sec. School",
+    qualification: "Higher Secondary (Class 12)",
+    period: "2018 — 2019",
+    details: ["Scored 474 / 500", "Silver Medalist"]
+  }
+];
+
+export type Achievement = {
+  title: string;
+  description: string;
+};
+
+export const achievements: Achievement[] = [
+  {
+    title: "Merit Scholarship",
+    description:
+      "Awarded the Merit Scholarship for four consecutive years at SSN College of Engineering for outstanding academic performance (CGPA 9.61/10)."
+  },
+  {
+    title: "Best Paper Award",
+    description:
+      "Won Best Paper Award at the International Conference on Material and Energy Technologies for research on Synchronous Motors, later published in a Springer Journal."
+  },
+  {
+    title: "IEEE Member",
+    description:
+      "Active IEEE Member contributing to technical webinars, workshops, and student-led innovation initiatives at SSN College of Engineering."
   }
 ];
