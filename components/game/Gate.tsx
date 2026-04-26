@@ -1,91 +1,107 @@
 'use client'
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text } from '@react-three/drei'
+import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Milestone } from '@/lib/gameData'
 
 interface GateProps {
   milestone: Milestone
-  worldZ: number  // scrollZ - milestone.position; 0 = at player, negative = ahead
+  worldZ: number
   seen: boolean
 }
 
+// Olympic ring colors cycle per milestone
+const OLYMPIC_COLORS = ['#0057A8', '#000000', '#c8102e', '#ffd700', '#1a8c1a']
+
 export default function Gate({ milestone, worldZ, seen }: GateProps) {
-  const lightRef = useRef<THREE.PointLight>(null)
-  const glowRef = useRef<THREE.Mesh>(null)
-  const isNear = worldZ > -12 && worldZ < 3
+  const tapeRef = useRef<THREE.Mesh>(null)
+  const glowRef = useRef<THREE.PointLight>(null)
+  const idx = ['hero','education','achievements','everstage','chargebee','skills','contact'].indexOf(milestone.id)
+  const accentColor = OLYMPIC_COLORS[idx % OLYMPIC_COLORS.length]
+  const isNear = worldZ > -10 && worldZ < 3
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
-    if (isNear && !seen) {
-      const pulse = 0.7 + Math.sin(t * 5) * 0.3
-      if (lightRef.current) lightRef.current.intensity = pulse * 5
-      if (glowRef.current) {
-        const mat = glowRef.current.material as THREE.MeshBasicMaterial
-        mat.opacity = pulse * 0.18
-      }
+    if (tapeRef.current && isNear && !seen) {
+      // Tape flutter
+      tapeRef.current.rotation.y = Math.sin(t * 6) * 0.04
+      const mat = tapeRef.current.material as THREE.MeshStandardMaterial
+      mat.emissiveIntensity = 0.3 + Math.sin(t * 4) * 0.2
+    }
+    if (glowRef.current && isNear && !seen) {
+      glowRef.current.intensity = 2 + Math.sin(t * 5) * 0.8
     }
   })
 
-  // Only render when in range
   if (worldZ > 6 || worldZ < -100) return null
 
-  const c = milestone.color
-  const emI = seen ? 0.15 : 1.2
+  const emI = seen ? 0.1 : 0.9
 
   return (
     <group position={[0, 0, worldZ]}>
-      {/* Left pillar */}
-      <mesh position={[-3.6, 2.2, 0]} castShadow>
-        <boxGeometry args={[0.28, 4.4, 0.28]} />
-        <meshStandardMaterial color="#050714" emissive={c} emissiveIntensity={emI} roughness={0.1} metalness={0.9} />
+      {/* Left arch pillar */}
+      <mesh position={[-5.7, 3, 0]}>
+        <cylinderGeometry args={[0.22, 0.28, 6, 12]} />
+        <meshStandardMaterial color={accentColor} emissive={accentColor} emissiveIntensity={emI} roughness={0.3} metalness={0.5} />
       </mesh>
 
-      {/* Right pillar */}
-      <mesh position={[3.6, 2.2, 0]} castShadow>
-        <boxGeometry args={[0.28, 4.4, 0.28]} />
-        <meshStandardMaterial color="#050714" emissive={c} emissiveIntensity={emI} roughness={0.1} metalness={0.9} />
+      {/* Right arch pillar */}
+      <mesh position={[5.7, 3, 0]}>
+        <cylinderGeometry args={[0.22, 0.28, 6, 12]} />
+        <meshStandardMaterial color={accentColor} emissive={accentColor} emissiveIntensity={emI} roughness={0.3} metalness={0.5} />
       </mesh>
 
-      {/* Top bar */}
-      <mesh position={[0, 4.5, 0]}>
-        <boxGeometry args={[7.52, 0.28, 0.28]} />
-        <meshStandardMaterial color="#050714" emissive={c} emissiveIntensity={emI} roughness={0.1} metalness={0.9} />
+      {/* Top crossbar */}
+      <mesh position={[0, 6.15, 0]}>
+        <boxGeometry args={[11.64, 0.44, 0.44]} />
+        <meshStandardMaterial color={accentColor} emissive={accentColor} emissiveIntensity={emI} roughness={0.3} metalness={0.5} />
       </mesh>
 
-      {/* Corner joints */}
-      {([-3.6, 3.6] as number[]).map((x) => (
-        <mesh key={x} position={[x, 4.5, 0]}>
-          <sphereGeometry args={[0.2, 8, 8]} />
-          <meshStandardMaterial color={c} emissive={c} emissiveIntensity={emI * 1.5} roughness={0} metalness={1} />
+      {/* Finish-line tape */}
+      <mesh ref={tapeRef} position={[0, 1.0, 0.05]}>
+        <planeGeometry args={[11.24, 0.18]} />
+        <meshStandardMaterial
+          color="white"
+          emissive="white"
+          emissiveIntensity={seen ? 0 : 0.4}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Sponsor banner */}
+      <mesh position={[0, 5.0, 0.1]}>
+        <planeGeometry args={[9, 1.1]} />
+        <meshStandardMaterial color={accentColor} emissive={accentColor} emissiveIntensity={emI * 0.5} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Banner label */}
+      <Html position={[0, 5.02, 0.22]} center distanceFactor={10}>
+        <div style={{
+          color: 'white',
+          fontFamily: 'monospace',
+          fontSize: '10px',
+          fontWeight: 900,
+          letterSpacing: '0.18em',
+          whiteSpace: 'nowrap',
+          textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+          pointerEvents: 'none',
+        }}>
+          {milestone.label}
+        </div>
+      </Html>
+
+      {/* Olympic rings decoration on crossbar */}
+      {OLYMPIC_COLORS.map((col, i) => (
+        <mesh key={i} position={[-2.4 + i * 1.2, 6.15, 0.3]}>
+          <torusGeometry args={[0.28, 0.07, 8, 20]} />
+          <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.3} />
         </mesh>
       ))}
 
-      {/* Gate label */}
-      <Text
-        position={[0, 5.1, 0]}
-        fontSize={0.32}
-        color={c}
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.03}
-        outlineColor="#000000"
-      >
-        {milestone.label}
-      </Text>
-
-      {/* Gate glow fill */}
+      {/* Glow light */}
       {!seen && (
-        <mesh ref={glowRef} position={[0, 2.2, 0.08]}>
-          <planeGeometry args={[7.24, 4.4]} />
-          <meshBasicMaterial color={c} transparent opacity={0.08} side={THREE.DoubleSide} depthWrite={false} />
-        </mesh>
-      )}
-
-      {/* Ambient glow light */}
-      {!seen && (
-        <pointLight ref={lightRef} position={[0, 2.5, 0]} color={c} intensity={4} distance={15} />
+        <pointLight ref={glowRef} position={[0, 3, 1]} color={accentColor} intensity={2.5} distance={18} />
       )}
     </group>
   )

@@ -1,70 +1,56 @@
 'use client'
-import * as THREE from 'three'
 
 const TILE_LEN = 20
 const N_TILES = 10
 const TOTAL = N_TILES * TILE_LEN
-const TRACK_W = 7.2
+const TRACK_W = 11.5   // 8 athletic lanes
+const INNER_W = 18     // green infield width
 
 function tileZ(i: number, scrollZ: number): number {
   return -(((i * TILE_LEN - scrollZ % TOTAL) + TOTAL) % TOTAL)
 }
 
+// Standard 8-lane track: lane dividers at every 1.22m, scaled ×1.5
+const LANE_DIVIDERS = [-4.27, -3.05, -1.83, -0.61, 0.61, 1.83, 3.05, 4.27]
+
 function TrackTile({ z }: { z: number }) {
   return (
     <group position={[0, 0, z]}>
-      {/* Floor */}
+      {/* Orange polyurethane track surface */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[TRACK_W, TILE_LEN]} />
-        <meshStandardMaterial color="#07071a" roughness={0.9} metalness={0.1} />
+        <meshStandardMaterial color="#c84b11" roughness={0.85} metalness={0} />
       </mesh>
 
-      {/* Center dashes */}
-      <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.06, TILE_LEN * 0.4]} />
-        <meshBasicMaterial color="#00f5ff" transparent opacity={0.25} />
-      </mesh>
+      {/* White lane dividers */}
+      {LANE_DIVIDERS.map((x, i) => (
+        <mesh key={i} position={[x, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.06, TILE_LEN]} />
+          <meshBasicMaterial color="white" />
+        </mesh>
+      ))}
 
-      {/* Left lane divider */}
-      <mesh position={[-2.4, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.06, TILE_LEN]} />
-        <meshBasicMaterial color="#00f5ff" transparent opacity={0.5} />
-      </mesh>
-
-      {/* Right lane divider */}
-      <mesh position={[2.4, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.06, TILE_LEN]} />
-        <meshBasicMaterial color="#00f5ff" transparent opacity={0.5} />
-      </mesh>
-
-      {/* Left edge */}
-      <mesh position={[-TRACK_W / 2, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Left outer edge */}
+      <mesh position={[-5.62, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.12, TILE_LEN]} />
-        <meshBasicMaterial color="#a855f7" transparent opacity={0.9} />
+        <meshBasicMaterial color="white" />
       </mesh>
-
-      {/* Right edge */}
-      <mesh position={[TRACK_W / 2, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Right outer edge */}
+      <mesh position={[5.62, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.12, TILE_LEN]} />
-        <meshBasicMaterial color="#a855f7" transparent opacity={0.9} />
+        <meshBasicMaterial color="white" />
       </mesh>
 
-      {/* Left barrier wall */}
-      <mesh position={[-TRACK_W / 2 - 0.05, 0.4, 0]}>
-        <boxGeometry args={[0.1, 0.8, TILE_LEN]} />
-        <meshStandardMaterial color="#1a0030" emissive="#a855f7" emissiveIntensity={0.3} />
+      {/* Transverse distance marker at tile boundary */}
+      <mesh position={[0, 0.006, -TILE_LEN / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[TRACK_W, 0.15]} />
+        <meshBasicMaterial color="white" transparent opacity={0.9} />
       </mesh>
 
-      {/* Right barrier wall */}
-      <mesh position={[TRACK_W / 2 + 0.05, 0.4, 0]}>
-        <boxGeometry args={[0.1, 0.8, TILE_LEN]} />
-        <meshStandardMaterial color="#1a0030" emissive="#a855f7" emissiveIntensity={0.3} />
-      </mesh>
-
-      {/* Transverse grid line at tile boundary */}
-      <mesh position={[0, 0.005, -TILE_LEN / 2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[TRACK_W, 0.1]} />
-        <meshBasicMaterial color="#00f5ff" transparent opacity={0.2} />
+      {/* Green infield (inner grass) */}
+      <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[INNER_W, TILE_LEN]} />
+        <meshStandardMaterial color="#2d7a2d" roughness={0.95} metalness={0} />
       </mesh>
     </group>
   )

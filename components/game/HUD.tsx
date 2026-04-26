@@ -17,13 +17,13 @@ export default function HUD() {
       <div className="absolute top-4 left-0 right-0 z-10 px-5 flex items-start justify-between pointer-events-none">
         {/* Progress */}
         <div className="min-w-[180px]">
-          <div className="text-cyan-400 text-xs font-mono mb-1 tracking-wider">
-            {seenMilestones.length} / {milestones.length} CHECKPOINTS
+          <div className="text-yellow-600 text-xs font-mono mb-1 tracking-wider font-bold">
+            🏅 {seenMilestones.length} / {milestones.length} CHECKPOINTS
           </div>
-          <div className="h-[3px] bg-white/10 rounded-full overflow-hidden w-44">
+          <div className="h-[4px] bg-black/20 rounded-full overflow-hidden w-44">
             <div
               className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${progress * 100}%`, background: '#00f5ff' }}
+              style={{ width: `${progress * 100}%`, background: '#c8102e' }}
             />
           </div>
         </div>

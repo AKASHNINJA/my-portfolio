@@ -1,6 +1,6 @@
 'use client'
 import { useFrame } from '@react-three/fiber'
-import { Stars } from '@react-three/drei'
+import { Sky } from '@react-three/drei'
 import { useGameStore } from '@/store/gameStore'
 import { milestones, GAME_SPEED } from '@/lib/gameData'
 import Track from './Track'
@@ -14,40 +14,47 @@ export default function Scene() {
   useFrame((state, delta) => {
     tick(delta, GAME_SPEED)
 
-    // Camera: stay behind and above player, look ahead
-    state.camera.position.set(0, 3.8, 7.5)
-    state.camera.lookAt(0, 0.8, -4)
+    // Fixed third-person camera behind the runner
+    state.camera.position.set(0, 4.2, 8)
+    state.camera.lookAt(0, 1.2, -6)
 
-    // Trigger milestone gates
+    // Milestone triggers
     milestones.forEach((m, i) => {
       if (!seenMilestones.includes(i)) {
         const relZ = scrollZ - m.position
-        if (relZ >= -0.5 && relZ <= 2.5) {
-          openMilestone(i)
-        }
+        if (relZ >= -0.5 && relZ <= 2.5) openMilestone(i)
       }
     })
   })
 
   return (
     <>
-      <color attach="background" args={['#050714']} />
-      <fog attach="fog" args={['#050714', 50, 100]} />
+      {/* Daylight sky */}
+      <Sky sunPosition={[100, 60, -100]} turbidity={6} rayleigh={0.5} />
+      <color attach="background" args={['#87ceeb']} />
+      <fog attach="fog" args={['#d0e8f0', 60, 120]} />
 
-      {/* Lighting — bright enough to see the neon track */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 12, 5]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[0, 8, 0]} intensity={3} color="#00f5ff" distance={40} />
-      <pointLight position={[-10, 5, -15]} intensity={1.5} color="#a855f7" distance={30} />
-      <pointLight position={[10, 5, -15]} intensity={1.5} color="#a855f7" distance={30} />
-
-      {/* Sky */}
-      <Stars radius={130} depth={70} count={5000} factor={4} saturation={0} fade speed={0.3} />
+      {/* Stadium lighting */}
+      <ambientLight intensity={1.2} color="#fff9f0" />
+      <directionalLight
+        position={[30, 50, 20]}
+        intensity={2.5}
+        color="#fffde8"
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+      />
+      <directionalLight position={[-20, 30, -10]} intensity={0.6} color="#c8e0ff" />
 
       {/* World */}
       <Track scrollZ={scrollZ} />
       <City scrollZ={scrollZ} />
       <Player />
+
+      {/* Far ground plane */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, -60]} receiveShadow>
+        <planeGeometry args={[200, 600]} />
+        <meshStandardMaterial color="#2d7a2d" roughness={0.95} />
+      </mesh>
 
       {/* Milestone gates */}
       {milestones.map((m, i) => (
