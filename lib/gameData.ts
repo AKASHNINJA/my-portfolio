@@ -7,7 +7,11 @@ export interface Milestone {
   subtitle?: string
   items: string[]
   color: string
-  position: number // world-Z distance from start
+  position: number
+  zoneX: number
+  zoneZ: number
+  zoneRadius: number
+  zoneIcon: string
 }
 
 export const GATE_INTERVAL = 60
@@ -27,6 +31,8 @@ export const milestones: Milestone[] = [
     ],
     color: '#00f5ff',
     position: 1 * GATE_INTERVAL,
+    zoneX: 0, zoneZ: -12, zoneRadius: 10,
+    zoneIcon: '🏡',
   },
   {
     id: 'education',
@@ -40,6 +46,8 @@ export const milestones: Milestone[] = [
     ]),
     color: '#a855f7',
     position: 2 * GATE_INTERVAL,
+    zoneX: -22, zoneZ: -36, zoneRadius: 11,
+    zoneIcon: '📚',
   },
   {
     id: 'achievements',
@@ -49,6 +57,8 @@ export const milestones: Milestone[] = [
     items: achievements.map(a => `🏆 ${a.title}: ${a.description}`),
     color: '#f59e0b',
     position: 3 * GATE_INTERVAL,
+    zoneX: 22, zoneZ: -36, zoneRadius: 11,
+    zoneIcon: '🏆',
   },
   {
     id: 'everstage',
@@ -58,6 +68,8 @@ export const milestones: Milestone[] = [
     items: experience[1].bullets.map(b => `▸ ${b}`),
     color: '#10b981',
     position: 4 * GATE_INTERVAL,
+    zoneX: -22, zoneZ: -64, zoneRadius: 11,
+    zoneIcon: '🌾',
   },
   {
     id: 'chargebee',
@@ -67,6 +79,8 @@ export const milestones: Milestone[] = [
     items: experience[0].bullets.map(b => `▸ ${b}`),
     color: '#3b82f6',
     position: 5 * GATE_INTERVAL,
+    zoneX: 22, zoneZ: -64, zoneRadius: 11,
+    zoneIcon: '🍎',
   },
   {
     id: 'skills',
@@ -81,6 +95,8 @@ export const milestones: Milestone[] = [
     ],
     color: '#ec4899',
     position: 6 * GATE_INTERVAL,
+    zoneX: 0, zoneZ: -90, zoneRadius: 10,
+    zoneIcon: '🔧',
   },
   {
     id: 'contact',
@@ -95,5 +111,7 @@ export const milestones: Milestone[] = [
     ],
     color: '#f97316',
     position: 7 * GATE_INTERVAL,
+    zoneX: 0, zoneZ: -114, zoneRadius: 12,
+    zoneIcon: '✉️',
   },
 ]
