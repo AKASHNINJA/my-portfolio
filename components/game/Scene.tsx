@@ -1,7 +1,6 @@
 'use client'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
-import * as THREE from 'three'
 import { useGameStore } from '@/store/gameStore'
 import { milestones, GAME_SPEED } from '@/lib/gameData'
 import Track from './Track'
@@ -9,19 +8,15 @@ import Player from './Player'
 import Gate from './Gate'
 import City from './City'
 
-const CAM_POS = new THREE.Vector3(0, 3.8, 7.5)
-const CAM_TARGET = new THREE.Vector3(0, 0.8, -4)
-
 export default function Scene() {
-  const { tick, scrollZ, openMilestone, seenMilestones, phase } = useGameStore()
-  const { camera } = useThree()
+  const { tick, scrollZ, openMilestone, seenMilestones } = useGameStore()
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     tick(delta, GAME_SPEED)
 
-    // Smooth camera position
-    camera.position.lerp(CAM_POS, 0.1)
-    camera.lookAt(CAM_TARGET)
+    // Camera: stay behind and above player, look ahead
+    state.camera.position.set(0, 3.8, 7.5)
+    state.camera.lookAt(0, 0.8, -4)
 
     // Trigger milestone gates
     milestones.forEach((m, i) => {
@@ -37,14 +32,14 @@ export default function Scene() {
   return (
     <>
       <color attach="background" args={['#050714']} />
-      <fog attach="fog" args={['#050714', 45, 95]} />
+      <fog attach="fog" args={['#050714', 50, 100]} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.12} />
-      <directionalLight position={[5, 12, 5]} intensity={0.4} color="#ffffff" castShadow />
-      <pointLight position={[0, 10, 0]} intensity={1.5} color="#00f5ff" distance={35} />
-      <pointLight position={[-12, 6, -20]} intensity={0.8} color="#a855f7" distance={25} />
-      <pointLight position={[12, 6, -20]} intensity={0.8} color="#a855f7" distance={25} />
+      {/* Lighting — bright enough to see the neon track */}
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 12, 5]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[0, 8, 0]} intensity={3} color="#00f5ff" distance={40} />
+      <pointLight position={[-10, 5, -15]} intensity={1.5} color="#a855f7" distance={30} />
+      <pointLight position={[10, 5, -15]} intensity={1.5} color="#a855f7" distance={30} />
 
       {/* Sky */}
       <Stars radius={130} depth={70} count={5000} factor={4} saturation={0} fade speed={0.3} />

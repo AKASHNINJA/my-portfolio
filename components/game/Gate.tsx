@@ -71,7 +71,6 @@ export default function Gate({ milestone, worldZ, seen }: GateProps) {
         anchorY="middle"
         outlineWidth={0.03}
         outlineColor="#000000"
-        font="https://fonts.gstatic.com/s/spacemono/v13/i7dPIFZifjKcF5UAWdDRYEF8RQ.woff2"
       >
         {milestone.label}
       </Text>
