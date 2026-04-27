@@ -1,64 +1,78 @@
 'use client'
 import { create } from 'zustand'
 
-export type Phase = 'intro' | 'running' | 'milestone' | 'complete'
+export type Phase = 'intro' | 'roaming' | 'milestone' | 'complete'
+
+const PLAYER_SPEED = 9
+const FARM_MIN_X = -36
+const FARM_MAX_X = 36
+const FARM_MIN_Z = -128
+const FARM_MAX_Z = 5
 
 interface GameStore {
   phase: Phase
-  scrollZ: number
+  playerX: number
+  playerZ: number
+  playerRotY: number
+  moveX: number
+  moveZ: number
+  isMoving: boolean
   activeMilestone: number | null
   seenMilestones: number[]
 
-  // Player movement
-  lane: -1 | 0 | 1
-  playerX: number
-  playerY: number
-  isJumping: boolean
-  jumpTime: number
-  isStumbling: boolean
-  stumbleCount: number
-
   start: () => void
-  tick: (delta: number, speed: number) => void
+  setMove: (mx: number, mz: number) => void
+  tick: (delta: number) => void
   openMilestone: (i: number) => void
   closeMilestone: (total: number) => void
   reset: () => void
-  moveLane: (dir: -1 | 1) => void
-  startJump: () => void
-  setPlayerX: (x: number) => void
-  setPlayerY: (y: number) => void
-  landJump: () => void
-  stumble: () => void
 }
-
-export const LANE_X = [-2.4, 0, 2.4] // x positions for lanes -1, 0, 1
 
 export const useGameStore = create<GameStore>((set, get) => ({
   phase: 'intro',
-  scrollZ: 0,
+  playerX: 0,
+  playerZ: 2,
+  playerRotY: Math.PI,
+  moveX: 0,
+  moveZ: 0,
+  isMoving: false,
   activeMilestone: null,
   seenMilestones: [],
-  lane: 0,
-  playerX: 0,
-  playerY: 0,
-  isJumping: false,
-  jumpTime: 0,
 
   start: () => set({
-    phase: 'running', scrollZ: 0,
-    seenMilestones: [], activeMilestone: null,
-    lane: 0, playerX: 0, playerY: 0, isJumping: false,
+    phase: 'roaming',
+    playerX: 0,
+    playerZ: 2,
+    playerRotY: Math.PI,
+    moveX: 0,
+    moveZ: 0,
+    isMoving: false,
+    activeMilestone: null,
+    seenMilestones: [],
   }),
 
-  tick: (delta, speed) => {
-    if (get().phase !== 'running') return
-    set(s => ({ scrollZ: s.scrollZ + speed * delta }))
+  setMove: (mx, mz) => set({ moveX: mx, moveZ: mz }),
+
+  tick: (delta) => {
+    const { phase, playerX, playerZ, moveX, moveZ } = get()
+    if (phase !== 'roaming') return
+
+    const len = Math.sqrt(moveX * moveX + moveZ * moveZ)
+    if (len < 0.01) { set({ isMoving: false }); return }
+
+    const nx = moveX / len
+    const nz = moveZ / len
+    const newX = Math.max(FARM_MIN_X, Math.min(FARM_MAX_X, playerX + nx * PLAYER_SPEED * delta))
+    const newZ = Math.max(FARM_MIN_Z, Math.min(FARM_MAX_Z, playerZ + nz * PLAYER_SPEED * delta))
+    const rotY = Math.atan2(nx, nz)
+
+    set({ playerX: newX, playerZ: newZ, playerRotY: rotY, isMoving: true })
   },
 
   openMilestone: (i) => {
     const { seenMilestones, phase } = get()
-    if (seenMilestones.includes(i) || phase !== 'running') return
-    set({ phase: 'milestone', activeMilestone: i })
+    if (seenMilestones.includes(i) || phase !== 'roaming') return
+    set({ phase: 'milestone', activeMilestone: i, isMoving: false })
   },
 
   closeMilestone: (total) => {
@@ -66,31 +80,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (activeMilestone === null) return
     const next = [...seenMilestones, activeMilestone]
     set({
-      phase: next.length >= total ? 'complete' : 'running',
+      phase: next.length >= total ? 'complete' : 'roaming',
       activeMilestone: null,
       seenMilestones: next,
     })
   },
 
   reset: () => set({
-    phase: 'intro', scrollZ: 0, activeMilestone: null,
-    seenMilestones: [], lane: 0, playerX: 0, playerY: 0, isJumping: false,
+    phase: 'intro',
+    playerX: 0,
+    playerZ: 2,
+    playerRotY: Math.PI,
+    moveX: 0,
+    moveZ: 0,
+    isMoving: false,
+    activeMilestone: null,
+    seenMilestones: [],
   }),
-
-  moveLane: (dir) => {
-    const { lane, phase } = get()
-    if (phase !== 'running') return
-    const next = Math.max(-1, Math.min(1, lane + dir)) as -1 | 0 | 1
-    set({ lane: next })
-  },
-
-  startJump: () => {
-    const { isJumping, phase } = get()
-    if (isJumping || phase !== 'running') return
-    set({ isJumping: true, jumpTime: 0 })
-  },
-
-  setPlayerX: (playerX) => set({ playerX }),
-  setPlayerY: (playerY) => set({ playerY }),
-  landJump: () => set({ isJumping: false, playerY: 0, jumpTime: 0 }),
 }))
