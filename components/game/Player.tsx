@@ -77,9 +77,9 @@ export default function Player() {
   })
 
   const SKIN   = '#e8b89a'
-  const JERSEY = '#2d7a2d'   // farm green
-  const SHORTS = '#5c3317'   // earthy brown
-  const SHOE   = '#3d1f00'
+  const JERSEY = '#1a3a6a'   // city navy blue
+  const SHORTS = '#2a2a3a'   // dark charcoal
+  const SHOE   = '#1a1a2a'
   const SOLE   = '#e8e0d0'
   const HAIR   = '#1a0a00'
 
@@ -212,19 +212,19 @@ export default function Player() {
               <sphereGeometry args={[0.185, 16, 12]} />
               <meshStandardMaterial color={SKIN} roughness={0.6} />
             </mesh>
-            {/* Straw hat */}
-            <mesh position={[0, 0.14, 0]}>
-              <cylinderGeometry args={[0.18, 0.18, 0.28, 10]} />
-              <meshStandardMaterial color="#d4a843" roughness={0.85} />
+            {/* City cap */}
+            <mesh position={[0, 0.16, 0]}>
+              <cylinderGeometry args={[0.18, 0.2, 0.22, 10]} />
+              <meshStandardMaterial color="#1a2a4a" roughness={0.6} />
             </mesh>
-            <mesh position={[0, 0.02, 0]}>
-              <cylinderGeometry args={[0.36, 0.36, 0.06, 12]} />
-              <meshStandardMaterial color="#c49830" roughness={0.85} />
+            <mesh position={[0, 0.06, 0.1]}>
+              <cylinderGeometry args={[0.22, 0.22, 0.04, 10]} />
+              <meshStandardMaterial color="#1a2a4a" roughness={0.6} />
             </mesh>
-            {/* Hat band */}
-            <mesh position={[0, 0.04, 0]}>
-              <cylinderGeometry args={[0.185, 0.185, 0.06, 10]} />
-              <meshStandardMaterial color="#8b5e3c" roughness={0.7} />
+            {/* Cap brim */}
+            <mesh position={[0, 0.05, 0.06]}>
+              <boxGeometry args={[0.32, 0.03, 0.22]} />
+              <meshStandardMaterial color="#111a30" roughness={0.6} />
             </mesh>
             {/* Eyes */}
             <mesh position={[-0.063, 0.015, 0.164]}>

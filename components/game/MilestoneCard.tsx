@@ -97,7 +97,7 @@ export default function MilestoneCard() {
                 whileHover={{ scale: 1.02, boxShadow: `0 0 24px ${ms.color}88` }}
                 whileTap={{ scale: 0.97 }}
               >
-                Continue Running →
+                Continue Exploring →
               </motion.button>
               <p className="text-center text-gray-600 text-xs mt-2 font-mono">
                 press SPACE or ENTER

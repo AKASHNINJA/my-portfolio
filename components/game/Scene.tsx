@@ -1,70 +1,71 @@
 'use client'
+import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sky } from '@react-three/drei'
+import * as THREE from 'three'
 import { useGameStore } from '@/store/gameStore'
-import { milestones, GAME_SPEED } from '@/lib/gameData'
-import Track from './Track'
-import Player from './Player'
-import Gate from './Gate'
+import { milestones } from '@/lib/gameData'
 import City from './City'
+import Player from './Player'
 
 export default function Scene() {
-  const { tick, scrollZ, openMilestone, seenMilestones } = useGameStore()
+  const { tick, openMilestone } = useGameStore()
+  const triggeredRef = useRef(new Set<number>())
 
   useFrame((state, delta) => {
-    tick(delta, GAME_SPEED)
+    const { playerX, playerZ, phase, seenMilestones } = useGameStore.getState()
+    tick(delta)
 
-    // Fixed third-person camera behind the runner
-    state.camera.position.set(0, 4.2, 8)
-    state.camera.lookAt(0, 1.2, -6)
+    // Smooth camera follow (third-person behind+above)
+    const camTargetX = playerX
+    const camTargetY = 14
+    const camTargetZ = playerZ + 18
 
-    // Milestone triggers
-    milestones.forEach((m, i) => {
-      if (!seenMilestones.includes(i)) {
-        const relZ = scrollZ - m.position
-        if (relZ >= -0.5 && relZ <= 2.5) openMilestone(i)
-      }
-    })
+    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, camTargetX, delta * 6)
+    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, camTargetY, delta * 6)
+    state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, camTargetZ, delta * 6)
+    state.camera.lookAt(playerX, 0.5, playerZ - 5)
+
+    // Zone detection — trigger once when player enters zone
+    if (phase === 'roaming') {
+      milestones.forEach((m, i) => {
+        if (seenMilestones.includes(i)) return
+        const dx = playerX - m.zoneX
+        const dz = playerZ - m.zoneZ
+        const dist = Math.sqrt(dx * dx + dz * dz)
+        if (dist < m.zoneRadius * 0.75 && !triggeredRef.current.has(i)) {
+          triggeredRef.current.add(i)
+          openMilestone(i)
+        }
+        // Reset trigger when player leaves (so re-entry doesn't retrigger)
+        if (dist > m.zoneRadius && triggeredRef.current.has(i) && seenMilestones.includes(i)) {
+          triggeredRef.current.delete(i)
+        }
+      })
+    }
   })
 
   return (
     <>
-      {/* Daylight sky */}
-      <Sky sunPosition={[100, 60, -100]} turbidity={6} rayleigh={0.5} />
-      <color attach="background" args={['#87ceeb']} />
-      <fog attach="fog" args={['#d0e8f0', 60, 120]} />
+      {/* City dusk sky */}
+      <Sky sunPosition={[40, 12, -80]} turbidity={8} rayleigh={1.2} mieCoefficient={0.008} mieDirectionalG={0.85} />
+      <color attach="background" args={['#8090b8']} />
+      <fog attach="fog" args={['#6070a8', 90, 180]} />
 
-      {/* Stadium lighting */}
-      <ambientLight intensity={1.2} color="#fff9f0" />
+      {/* Lighting */}
+      <ambientLight intensity={0.7} color="#c8d0f0" />
       <directionalLight
-        position={[30, 50, 20]}
-        intensity={2.5}
-        color="#fffde8"
+        position={[40, 50, 30]}
+        intensity={1.6}
+        color="#ffe8d0"
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
-      <directionalLight position={[-20, 30, -10]} intensity={0.6} color="#c8e0ff" />
+      <directionalLight position={[-20, 30, -20]} intensity={0.4} color="#a0b8ff" />
+      <hemisphereLight args={['#8090b8', '#303030', 0.5]} />
 
-      {/* World */}
-      <Track scrollZ={scrollZ} />
-      <City scrollZ={scrollZ} />
+      <City />
       <Player />
-
-      {/* Far ground plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, -60]} receiveShadow>
-        <planeGeometry args={[200, 600]} />
-        <meshStandardMaterial color="#2d7a2d" roughness={0.95} />
-      </mesh>
-
-      {/* Milestone gates */}
-      {milestones.map((m, i) => (
-        <Gate
-          key={m.id}
-          milestone={m}
-          worldZ={scrollZ - m.position}
-          seen={seenMilestones.includes(i)}
-        />
-      ))}
     </>
   )
 }

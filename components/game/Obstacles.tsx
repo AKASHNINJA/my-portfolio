@@ -2,7 +2,7 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { LANE_X } from '@/store/gameStore'
+const LANE_X = [-2.4, 0, 2.4]
 
 export interface Obstacle {
   pos:  number
