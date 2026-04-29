@@ -72,14 +72,14 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-10 flex items-center gap-5 text-slate-500 dark:text-slate-400"
+          className="mt-10 flex items-center gap-2 text-slate-500 dark:text-slate-400"
         >
           <a
             href={profile.socials.github}
             aria-label="GitHub"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-2 rounded-full hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Github size={20} />
           </a>
@@ -88,14 +88,14 @@ export default function Hero() {
             aria-label="LinkedIn"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-2 rounded-full hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Linkedin size={20} />
           </a>
           <a
             href={`mailto:${profile.email}`}
             aria-label="Email"
-            className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="p-2 rounded-full hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <Mail size={20} />
           </a>

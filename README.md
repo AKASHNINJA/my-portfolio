@@ -1,18 +1,144 @@
-# my-portfolio
+# Akash Premkumar — 3D Interactive Portfolio
 
-A modern, fast, fully-typed personal portfolio built with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, and **Framer Motion**. Includes dark mode, smooth scroll, animated sections, and a single source of truth for content.
+An explorable 3D city/farm built in the browser, where each milestone zone reveals a piece of my story — about, education, achievements, work, skills, and contact. Walk around with WASD/arrow keys and let the world unfold one zone at a time.
+
+> Built with **Next.js 14**, **React Three Fiber**, **Three.js**, **Zustand**, **Tailwind CSS**, and **Framer Motion**.
+
+![Start screen](public/preview-start.png)
+![Roaming](public/preview-running.png)
+
+---
 
 ## Tech stack
 
-- [Next.js 14](https://nextjs.org/) (App Router, React Server Components)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/) for subtle animations
-- [Lucide](https://lucide.dev/) icons
+| Layer | Choice | Why |
+|---|---|---|
+| Framework | [Next.js 14](https://nextjs.org/) (App Router) | File-based routing, RSC + client islands, easy Vercel deploys |
+| Language | [TypeScript](https://www.typescriptlang.org/) 5.5 | End-to-end type safety across the game store, scene, and content |
+| 3D engine | [Three.js](https://threejs.org/) `^0.167` | Battle-tested WebGL renderer |
+| 3D React layer | [`@react-three/fiber`](https://docs.pmnd.rs/react-three-fiber) | Declaratively describe a Three.js scene as React components |
+| 3D helpers | [`@react-three/drei`](https://github.com/pmndrs/drei) | `<Sky>`, cameras, and other batteries-included helpers |
+| State | [Zustand](https://zustand-demo.pmnd.rs/) `^5` | Tiny, hookable game store — phase, player position, milestones |
+| Styling | [Tailwind CSS](https://tailwindcss.com/) `3.4` | Fast utility-first styling for the 2D HUD and overlays |
+| 2D animation | [Framer Motion](https://www.framer.com/motion/) | Smooth transitions on the start screen and milestone cards |
+| Icons | [Lucide](https://lucide.dev/) | Lightweight icon set for HUD and overlays |
+| Tooling | ESLint, PostCSS, Autoprefixer | Standard Next.js dev experience |
+
+---
+
+## Architecture at a glance
+
+```
+                       ┌─────────────────────────────────────┐
+                       │            app/page.tsx             │
+                       │  (mounts canvas + 2D HUD overlays)  │
+                       └────────────────┬────────────────────┘
+                                        │
+            ┌───────────────────────────┼───────────────────────────┐
+            │                           │                           │
+            ▼                           ▼                           ▼
+   ┌────────────────┐         ┌──────────────────┐         ┌──────────────────┐
+   │  GameCanvas    │         │   Controls       │         │  HUD / Overlays  │
+   │ (R3F <Canvas>) │         │  (keyboard →     │         │  StartScreen     │
+   │                │         │   gameStore)     │         │  MilestoneCard   │
+   └────────┬───────┘         └────────┬─────────┘         │  HUD             │
+            │                          │                   └────────┬─────────┘
+            ▼                          │                            │
+   ┌────────────────┐                  │                            │
+   │     Scene      │ ───── reads ─────┴────── reads ───────────────┘
+   │  (camera, sky, │                  │
+   │   lighting,    │                  ▼
+   │   zone trigger)│         ┌──────────────────┐
+   └────────┬───────┘         │   gameStore      │  ◄─── tick(), setMove(),
+            │                 │   (Zustand)      │       openMilestone(),
+            ▼                 │                  │       closeMilestone()
+   ┌────────────────┐         │  phase           │
+   │ City / Farm /  │         │  playerX, Z, rotY│
+   │ Player /       │         │  moveX, Z        │
+   │ Obstacles /    │         │  activeMilestone │
+   │ Gate           │         │  seenMilestones  │
+   └────────────────┘         └──────────────────┘
+                                       ▲
+                                       │
+                              ┌──────────────────┐
+                              │  lib/data.ts     │  resume content
+                              │  lib/gameData.ts │  milestone zones, icons
+                              └──────────────────┘
+```
+
+### How a frame flows
+
+1. **Input** — `Controls.tsx` listens for keyboard events and writes a normalised movement vector (`moveX`, `moveZ`) into the Zustand store every animation frame.
+2. **Tick** — `Scene.tsx` calls `gameStore.tick(delta)` on every R3F `useFrame`, which integrates the movement vector into the player's world position with bounds clamping.
+3. **Camera** — Same `useFrame` lerps the third-person camera behind/above the player and aims at a point ahead of them.
+4. **Zone detection** — Scene checks the player's distance to each milestone zone in `gameData.ts`. Entering a zone the first time switches `phase: 'roaming' → 'milestone'` and sets `activeMilestone`.
+5. **Render** — `MilestoneCard.tsx` (a 2D React overlay) reads `activeMilestone` from the store and shows the relevant content from `lib/data.ts`. Pressing Space/Enter dispatches `closeMilestone()` and movement resumes.
+6. **Completion** — Once `seenMilestones.length === milestones.length`, the store flips to `phase: 'complete'`.
+
+### State machine
+
+```
+              start()             enter zone           close card (more left)
+   intro ───────────────► roaming ──────────► milestone ─────────────────────┐
+     ▲                      ▲   │                  │                          │
+     │                      │   │ close card       │                          │
+     │ reset()              │   │ (all done)       │                          │
+     │                      └───┴────────► complete ◄─────────────────────────┘
+```
+
+---
+
+## Project structure
+
+```
+my-portfolio/
+├── app/
+│   ├── globals.css            # Tailwind + base styles
+│   ├── layout.tsx             # Root layout, metadata
+│   └── page.tsx               # Mounts <GameCanvas> + HUD overlays
+├── components/
+│   ├── game/
+│   │   ├── GameCanvas.tsx     # R3F <Canvas> + error boundary
+│   │   ├── Scene.tsx          # Camera, lighting, sky, zone triggers
+│   │   ├── City.tsx           # Cityscape geometry
+│   │   ├── Farm.tsx           # Farm scene geometry
+│   │   ├── Track.tsx          # Path / ground track
+│   │   ├── Player.tsx         # Avatar mesh + animation rig
+│   │   ├── Obstacles.tsx      # Static obstacle props
+│   │   ├── Gate.tsx           # Milestone gate visuals
+│   │   ├── Controls.tsx       # Keyboard → store (movement + phase actions)
+│   │   ├── HUD.tsx            # 2D HUD: minimap, hints, progress
+│   │   ├── MilestoneCard.tsx  # 2D overlay shown when a zone is entered
+│   │   └── StartScreen.tsx    # Intro overlay (Space to start)
+│   └── (legacy 2D sections)   # About, Hero, Skills, etc. kept for reference
+├── lib/
+│   ├── data.ts                # Resume content: profile, about, skills,
+│   │                          # projects, experience, education, achievements
+│   └── gameData.ts            # Milestone zones (id, position, icon, color)
+├── store/
+│   └── gameStore.ts           # Zustand store: phase + player + milestones
+├── public/
+│   ├── preview.png            # Hero/social preview
+│   ├── preview-start.png      # Start screen screenshot
+│   └── preview-running.png    # In-game screenshot
+├── next.config.mjs
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+---
+
+## Controls
+
+| Action | Keys |
+|---|---|
+| Start | `Space` (on intro screen) |
+| Move | `W` `A` `S` `D` or `↑` `←` `↓` `→` |
+| Close milestone card | `Space` or `Enter` |
+
+---
 
 ## Getting started
-
-Install dependencies and run the dev server:
 
 ```bash
 npm install
@@ -28,69 +154,59 @@ npm run build
 npm start
 ```
 
-## Customizing your portfolio
+---
 
-All content lives in **one file** so you can make it yours in minutes:
+## Customizing
 
-- `lib/data.ts` — your name, tagline, socials, about text, skills, projects, and experience.
-- `app/layout.tsx` — site-wide metadata (uses values from `lib/data.ts`).
-- `tailwind.config.ts` — colors, fonts, animations.
-- `app/globals.css` — base styles and reusable utility classes (`.card`, `.btn-primary`, etc.).
+### Resume content (`lib/data.ts`)
 
-### Add a project
+All textual portfolio content lives here in typed exports: `profile`, `about`, `skills`, `projects`, `experience`, `education`, `achievements`. Edit values and the in-game milestone cards update automatically.
 
-Open `lib/data.ts` and append to the `projects` array:
+### Milestone layout (`lib/gameData.ts`)
+
+Each milestone zone is a plain object:
 
 ```ts
 {
-  title: "My new project",
-  description: "What it does in one sentence.",
-  tags: ["Next.js", "Postgres"],
-  liveUrl: "https://example.com",
-  repoUrl: "https://github.com/your-handle/my-new-project",
-  featured: true
+  id: 'education',
+  title: 'Education',
+  items: [...],
+  color: '#a855f7',
+  position: 2 * GATE_INTERVAL,
+  zoneX: -22, zoneZ: -36, zoneRadius: 11,
+  zoneIcon: '📚',
 }
 ```
 
-### Add your resume
+Add a new entry to `milestones[]`, give it a unique `(zoneX, zoneZ)` inside the farm bounds (`-36 ≤ X ≤ 36`, `-128 ≤ Z ≤ 5` per `store/gameStore.ts`), and the scene picks it up.
 
-Drop a PDF named `resume.pdf` into the `public/` folder. The hero/contact buttons will automatically link to `/resume.pdf` (configured in `lib/data.ts`).
+### Resume PDF
 
-## Project structure
+Drop `resume.pdf` into `public/` and the contact buttons will link to `/resume.pdf` (configured in `lib/data.ts → profile.resumeUrl`).
 
-```
-my-portfolio/
-├── app/
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
-├── components/
-│   ├── About.tsx
-│   ├── Contact.tsx
-│   ├── Experience.tsx
-│   ├── Footer.tsx
-│   ├── Hero.tsx
-│   ├── Navbar.tsx
-│   ├── Projects.tsx
-│   └── Skills.tsx
-├── lib/
-│   └── data.ts        ← edit me to personalize
-├── public/
-├── next.config.mjs
-├── tailwind.config.ts
-└── tsconfig.json
-```
+---
+
+## Performance notes
+
+- The R3F `<Canvas>` is dynamically imported with `ssr: false` to keep the server bundle tiny and avoid hydration mismatch.
+- An `<ErrorBoundary>` wraps the canvas so a WebGL or asset failure shows a friendly fallback instead of a blank screen.
+- Movement is driven by a single `requestAnimationFrame` loop in `Controls.tsx` (not React state), so per-frame input has zero render cost.
+- All scene-graph state (player position, phase, seen milestones) is centralised in Zustand — no prop drilling, easy to extend.
+
+---
 
 ## Deploy
 
-The easiest path is [Vercel](https://vercel.com/new):
+Deploys cleanly to [Vercel](https://vercel.com/new):
 
-1. Push this repo to GitHub.
-2. Import it in Vercel and accept defaults.
-3. Done — every push to `main` deploys automatically.
+1. Push to GitHub (already at [github.com/AKASHNINJA/my-portfolio](https://github.com/AKASHNINJA/my-portfolio)).
+2. Import the repo in Vercel and accept defaults.
+3. Every push to `main` ships automatically.
 
-You can also deploy to Netlify, Cloudflare Pages, or run `npm run build && npm start` on any Node host.
+Also works on Netlify, Cloudflare Pages, or any Node host via `npm run build && npm start`.
+
+---
 
 ## License
 
-MIT — make it yours.
+MIT — feel free to fork and remix.

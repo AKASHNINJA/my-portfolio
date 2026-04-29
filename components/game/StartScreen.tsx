@@ -1,7 +1,19 @@
 'use client'
 import { motion } from 'framer-motion'
+import { Building2, Home, BookOpen, Award, Briefcase, Wrench, Mail } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useGameStore } from '@/store/gameStore'
 import { milestones } from '@/lib/gameData'
+
+const ZONE_ICONS: Record<string, LucideIcon> = {
+  hero: Home,
+  education: BookOpen,
+  achievements: Award,
+  everstage: Briefcase,
+  chargebee: Building2,
+  skills: Wrench,
+  contact: Mail,
+}
 
 export default function StartScreen() {
   const { phase, start } = useGameStore()
@@ -23,13 +35,14 @@ export default function StartScreen() {
       >
         {/* Label */}
         <motion.div
-          className="text-xs font-mono tracking-[0.28em] uppercase mb-5"
+          className="flex items-center justify-center gap-2 text-xs font-mono tracking-[0.28em] uppercase mb-5"
           style={{ color: '#88aaff' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          🏙️ Interactive Portfolio City
+          <Building2 size={14} aria-hidden="true" />
+          Interactive Portfolio City
         </motion.div>
 
         {/* Title */}
@@ -68,24 +81,29 @@ export default function StartScreen() {
 
         {/* Zone preview */}
         <div className="flex flex-wrap gap-2 justify-center mb-8">
-          {milestones.map((m, i) => (
-            <motion.span
-              key={m.id}
-              className="text-xs font-mono px-2.5 py-1 rounded-full"
-              style={{ border: `1px solid ${m.color}44`, color: m.color + 'aa', background: m.color + '0a' }}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.35 + i * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {m.zoneIcon} {m.label.replace('— ', '')}
-            </motion.span>
-          ))}
+          {milestones.map((m, i) => {
+            const Icon = ZONE_ICONS[m.id] ?? Building2
+            return (
+              <motion.span
+                key={m.id}
+                className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full"
+                style={{ border: `1px solid ${m.color}44`, color: m.color + 'aa', background: m.color + '0a' }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.35 + i * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <Icon size={11} aria-hidden="true" />
+                {m.label.replace('— ', '')}
+              </motion.span>
+            )
+          })}
         </div>
 
         {/* CTA */}
         <motion.button
           onClick={start}
-          className="px-14 py-4 font-black text-lg rounded-full tracking-wider text-sm"
+          aria-label="Enter the City"
+          className="inline-flex items-center gap-2 px-14 py-4 font-black text-lg rounded-full tracking-wider"
           style={{
             background: 'linear-gradient(135deg, #2244aa, #4488ff)',
             color: '#e8f0ff',
@@ -94,9 +112,15 @@ export default function StartScreen() {
           whileHover={{ scale: 1.05, boxShadow: '0 6px 32px rgba(68,136,255,0.6)' }}
           whileTap={{ scale: 0.96 }}
         >
-          🏙️ Enter the City
+          <Building2 size={20} aria-hidden="true" />
+          Enter the City
         </motion.button>
         <p className="text-gray-600 text-xs mt-3 font-mono">or press SPACE</p>
+
+        {/* Mobile hint */}
+        <p className="text-gray-600 text-xs mt-2 font-mono md:hidden">
+          on mobile: drag anywhere to move
+        </p>
       </motion.div>
     </motion.div>
   )
